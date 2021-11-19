@@ -13,7 +13,7 @@ export interface schemaType extends stringObjectType {
 
 export type itemType = Partial<schemaType>;
 
-export const item: schemaType[] = [
+export const items: schemaType[] = [
   {
     task: "first",
     expired: JSON.stringify(

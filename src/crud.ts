@@ -6,7 +6,7 @@ export default class CRUD {
 
   private lastId: number;
 
-  protected readonly schema: schemaType;
+  readonly schema: schemaType;
 
   constructor(schema: schemaType, storageType = constants.STORAGE_LOCAL) {
     this.schema = schema;
@@ -14,16 +14,20 @@ export default class CRUD {
     this.lastId = 0;
   }
 
-  // eslint-disable-next-line
+  // eslint-disable-next-line class-methods-use-this
   validateSchema<T>(obj: Partial<T>, schema: T) {
     if (!obj) {
-      throw constants.STATUS_ERROR;
+      throw new Error(constants.STATUS_ERROR);
     }
-    Object.keys(obj).forEach((prop) => {
-      if (!Object.hasOwnProperty.call(schema, prop)) {
-        throw Error(`${constants.STATUS_ERROR}: no ${prop} in schema`);
-      }
-    });
+    try {
+      Object.keys(obj).forEach((prop) => {
+        if (!Object.hasOwnProperty.call(schema, prop)) {
+          throw new Error(`${constants.STATUS_ERROR}: no ${prop} in schema`);
+        }
+      });
+    } catch (e) {
+      throw e;
+    }
     return constants.STATUS_OK;
   }
 
@@ -54,7 +58,7 @@ export default class CRUD {
     switch (this.storageType) {
       case constants.STORAGE_LOCAL:
         if (!Object.hasOwnProperty.call(localStorage, `${id}`)) {
-          throw Error(`${constants.STATUS_ERROR}: no ${id} in storage`);
+          throw new Error(`${constants.STATUS_ERROR}: no ${id} in storage`);
         }
         item = { ...JSON.parse(localStorage.getItem(`${id}`) as string) };
         break;
@@ -95,7 +99,7 @@ export default class CRUD {
     switch (this.storageType) {
       case constants.STORAGE_LOCAL:
         if (!Object.hasOwnProperty.call(localStorage, `${id}`)) {
-          throw Error(`${constants.STATUS_ERROR}: no ${id} in storage`);
+          throw new Error(`${constants.STATUS_ERROR}: no ${id} in storage`);
         }
         localStorage.removeItem(`${id}`);
         break;

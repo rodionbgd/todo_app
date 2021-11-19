@@ -32,11 +32,9 @@ module.exports = {
                     code: 120,
                 },
             ],
-            "no-unused-vars": "off",
-            "no-shadow": "off",
             "no-useless-catch": "off",
-            "no-alert": "off",
-            "prefer-rest-params" : "off",
+            "jest/no-conditional-expect": "off",
+            "jest/no-try-expect": "off",
         },
     }],
     settings: {

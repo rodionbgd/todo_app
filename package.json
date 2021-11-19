@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "TODO application",
   "scripts": {
-    "test": "",
+    "test": "jest",
     "lint": "eslint src && prettier --check src",
     "lint:fix": "eslint --fix src && prettier --write src",
-    "ci": "npm run test && npm run lint:fix",
+    "ci": "npm test && npm run lint:fix",
     "prepare": "husky install",
     "dev": "webpack serve --node-env development",
     "build": "webpack --node-env production"
