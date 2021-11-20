@@ -21,6 +21,12 @@ describe("CRUD testing", () => {
       );
     }
 
+    try {
+      crud.validateSchema(null as unknown as itemType, crud.schema);
+    } catch (e) {
+      expect((e as Error).message).toBe(`${constants.STATUS_ERROR}`);
+    }
+
     item = { task: "shopping" };
     expect(crud.validateSchema(item, crud.schema)).toBe(constants.STATUS_OK);
   });
