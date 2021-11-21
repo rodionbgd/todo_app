@@ -1,9 +1,9 @@
-import { collection, deleteDoc, doc, getDocs } from "firebase/firestore/lite";
 import CRUD from "./crud";
 import TODO from "./todo";
 
 import { items, schema } from "./items";
 import { constants } from "./constants";
+import initTest from "./test/init_test";
 
 describe("TODO testing", () => {
   let todoLocalStorage: TODO;
@@ -14,20 +14,8 @@ describe("TODO testing", () => {
     todoLocalStorage = new TODO(schema);
     todoDB = new TODO(schema, constants.STORAGE_DB);
 
-    items.forEach((item) => todoLocalStorage.createItem(item));
-
-    const allItemsSnap = await getDocs(
-      collection(todoDB.db, todoDB.collectionName)
-    );
-    await allItemsSnap.forEach((itemSnap) =>
-      deleteDoc(doc(todoDB.db, todoDB.collectionName, `${itemSnap.id}`))
-    );
-    // FIXME: forEach
-    await todoDB.createItem(items[0]);
-    await todoDB.createItem(items[1]);
-    await todoDB.createItem(items[2]);
+    await initTest(todoDB, todoLocalStorage);
   });
-
   test("Instantiating TODO", () => {
     expect(todoLocalStorage).toBeInstanceOf(TODO);
     expect(todoLocalStorage).toBeInstanceOf(CRUD);
@@ -74,15 +62,21 @@ describe("TODO testing", () => {
       expect(filteredItems.length).toBe(1);
       expect(filteredItems[0]).toStrictEqual(items[2]);
     });
-    test("Filter by date", async () => {
-      const filterObj = { expired: items[0].expired };
-      let filteredItems = await todoLocalStorage.filter(filterObj);
-      expect(filteredItems.length).toBe(1);
-      expect(JSON.stringify(filteredItems[0])).toBe(JSON.stringify(items[0]));
-
-      filteredItems = await todoDB.filter(filterObj);
-      expect(filteredItems.length).toBe(1);
-      expect(filteredItems[0]).toStrictEqual(items[0]);
+    describe("Filter by date localStorage", () => {
+      test("Filter by date localStorage", async () => {
+        const filterObj = { expired: items[0].expired };
+        const filteredItems = await todoLocalStorage.filter(filterObj);
+        expect(filteredItems.length).toBe(1);
+        expect(JSON.stringify(filteredItems[0])).toBe(JSON.stringify(items[0]));
+      });
+    });
+    describe("Filter by date DB", () => {
+      test("Filter by date DB", async () => {
+        const filterObj = { expired: items[0].expired };
+        const filteredItems = await todoDB.filter(filterObj);
+        expect(filteredItems.length).toBe(1);
+        expect(filteredItems[0]).toStrictEqual(items[0]);
+      });
     });
     test("Complex filter", async () => {
       const filterObj = {

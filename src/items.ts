@@ -13,28 +13,27 @@ export interface schemaType extends stringObjectType {
 
 export type itemType = Partial<schemaType>;
 
+const dates = [
+  new Date(new Date().setDate(new Date().getDate() + 1)).toString(),
+  new Date(new Date().setDate(new Date().getDate() + 4)).toString(),
+  new Date(new Date().setDate(new Date().getDate() + 21)).toString(),
+];
 export const items: schemaType[] = [
   {
     task: "first",
-    expired: JSON.stringify(
-      new Date(new Date().setDate(new Date().getDate() + 1))
-    ),
+    expired: dates[0],
     status: constants.TASK_EXPIRED,
     tags: ["one", "one_one"],
   },
   {
     task: "second",
-    expired: JSON.stringify(
-      new Date(new Date().setDate(new Date().getDate() + 4))
-    ),
+    expired: dates[1],
     status: constants.TASK_IN_PROCESS,
     tags: ["two", "two_two"],
   },
   {
     task: "three",
-    expired: JSON.stringify(
-      new Date(new Date().setDate(new Date().getDate() + 21))
-    ),
+    expired: dates[2],
     status: constants.TASK_FULFILLED,
     tags: ["three", "two_two"],
   },

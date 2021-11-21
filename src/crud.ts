@@ -125,10 +125,9 @@ export default class CRUD {
         localStorage.setItem(`${id}`, JSON.stringify(newItem));
         break;
       case constants.STORAGE_DB:
-        await setDoc(doc(this.db, this.collectionName, `${id}`), item, {
+        return setDoc(doc(this.db, this.collectionName, `${id}`), item, {
           merge: true,
         });
-        break;
       default:
         break;
     }
