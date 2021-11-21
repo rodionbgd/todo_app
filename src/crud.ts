@@ -1,5 +1,15 @@
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  getFirestore,
+  deleteDoc,
+  setDoc,
+} from "firebase/firestore/lite";
 import { constants } from "./constants";
 import { schemaType, itemType } from "./items";
+import { appConfig } from "./firebase_config";
 
 export default class CRUD {
   protected readonly storageType: string;
@@ -8,10 +18,16 @@ export default class CRUD {
 
   readonly schema: schemaType;
 
+  readonly db: ReturnType<typeof getFirestore>;
+
+  readonly collectionName: string;
+
   constructor(schema: schemaType, storageType = constants.STORAGE_LOCAL) {
     this.schema = schema;
     this.storageType = storageType;
     this.lastId = 0;
+    this.db = getFirestore(appConfig);
+    this.collectionName = "todo";
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -37,24 +53,30 @@ export default class CRUD {
     } catch (e) {
       throw e;
     }
-    const schema = { ...this.schema };
+    const newItem = { ...this.schema };
     Object.entries(item).forEach(([key, value]) => {
-      schema[key] = value;
+      newItem[key] = value;
     });
     switch (this.storageType) {
       case constants.STORAGE_LOCAL:
-        localStorage.setItem(`${this.lastId}`, JSON.stringify(schema));
+        localStorage.setItem(`${this.lastId}`, JSON.stringify(newItem));
         this.lastId += 1;
         break;
       case constants.STORAGE_DB:
-        break;
+        this.lastId += 1;
+        return setDoc(
+          doc(this.db, this.collectionName, `${this.lastId - 1}`),
+          newItem
+        );
       default:
         break;
     }
+    return constants.STATUS_OK;
   }
 
-  async readItem(id: number) {
+  async readItem(id?: number) {
     let item;
+    let itemSnap;
     switch (this.storageType) {
       case constants.STORAGE_LOCAL:
         if (!Object.hasOwnProperty.call(localStorage, `${id}`)) {
@@ -63,7 +85,21 @@ export default class CRUD {
         item = { ...JSON.parse(localStorage.getItem(`${id}`) as string) };
         break;
       case constants.STORAGE_DB:
-        break;
+        if (id === undefined) {
+          const allItems: schemaType[] = [];
+          const allItemsSnap = await getDocs(
+            collection(this.db, this.collectionName)
+          );
+          allItemsSnap.forEach((itemDB) => {
+            allItems.push(itemDB.data() as schemaType);
+          });
+          return allItems;
+        }
+        itemSnap = await getDoc(doc(this.db, this.collectionName, `${id}`));
+        if (!itemSnap.exists()) {
+          throw new Error(`${constants.STATUS_ERROR}: no ${id} in storage`);
+        }
+        return itemSnap.data();
       default:
         break;
     }
@@ -89,10 +125,14 @@ export default class CRUD {
         localStorage.setItem(`${id}`, JSON.stringify(newItem));
         break;
       case constants.STORAGE_DB:
+        await setDoc(doc(this.db, this.collectionName, `${id}`), item, {
+          merge: true,
+        });
         break;
       default:
         break;
     }
+    return constants.STATUS_OK;
   }
 
   async deleteItem(id: number) {
@@ -104,9 +144,10 @@ export default class CRUD {
         localStorage.removeItem(`${id}`);
         break;
       case constants.STORAGE_DB:
-        break;
+        return deleteDoc(doc(this.db, this.collectionName, `${id}`));
       default:
         break;
     }
+    return constants.STATUS_OK;
   }
 }

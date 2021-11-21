@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "TODO application",
   "scripts": {
-    "test": "jest",
+    "test": "jest --runInBand",
     "lint": "eslint src && prettier --check src",
     "lint:fix": "eslint --fix src && prettier --write src",
     "ci": "npm test && npm run lint:fix",
