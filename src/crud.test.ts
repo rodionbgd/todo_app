@@ -9,7 +9,7 @@ describe("CRUD testing", () => {
   let crudDB: CRUD;
   beforeEach(() => {
     crudLocalStorage = new CRUD(schema);
-    crudDB = new CRUD(schema, constants.STORAGE_DB);
+    crudDB = new CRUD(schema, constants.STORAGE_DB, "todo_test");
   });
   test("Instantiating CRUD", () => {
     expect(crudLocalStorage).toBeInstanceOf(CRUD);
@@ -74,7 +74,15 @@ describe("CRUD testing", () => {
         });
       });
     });
-
+    describe("Delete task DB", () => {
+      test("Delete task DB", async () => {
+        await crudDB.deleteItem(1);
+        const itemSnap = await getDoc(
+          doc(crudDB.db, crudDB.collectionName, `${1}`)
+        );
+        expect(itemSnap.exists()).toBeFalsy();
+      });
+    });
     const newTask = {
       task: "one",
       status: constants.TASK_FULFILLED,
@@ -106,15 +114,6 @@ describe("CRUD testing", () => {
             );
           }
         });
-      });
-    });
-    describe("Delete task DB", () => {
-      test("Delete task DB", async () => {
-        await crudDB.deleteItem(1);
-        const itemSnap = await getDoc(
-          doc(crudDB.db, crudDB.collectionName, `${1}`)
-        );
-        expect(itemSnap.exists()).toBeFalsy();
       });
     });
   });

@@ -12,7 +12,7 @@ describe("TODO testing", () => {
   beforeEach(async () => {
     localStorage.clear();
     todoLocalStorage = new TODO(schema);
-    todoDB = new TODO(schema, constants.STORAGE_DB);
+    todoDB = new TODO(schema, constants.STORAGE_DB, "todo_test");
 
     await initTest(todoDB, todoLocalStorage);
   });

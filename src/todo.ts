@@ -4,8 +4,12 @@ import CRUD from "./crud";
 import { itemType, schemaType } from "./items";
 
 export default class TODO extends CRUD {
-  constructor(schema: schemaType, storageType = constants.STORAGE_LOCAL) {
-    super(schema, storageType);
+  constructor(
+    schema: schemaType,
+    storageType = constants.STORAGE_LOCAL,
+    collectionName = ""
+  ) {
+    super(schema, storageType, collectionName);
   }
 
   async filter(options: itemType) {
@@ -18,6 +22,7 @@ export default class TODO extends CRUD {
     let allItemsSnap: any;
     switch (this.storageType) {
       case constants.STORAGE_LOCAL:
+        await null;
         Object.keys(localStorage).forEach((index) => {
           items.push(JSON.parse(localStorage.getItem(index) as string));
         });

@@ -22,12 +22,16 @@ export default class CRUD {
 
   readonly collectionName: string;
 
-  constructor(schema: schemaType, storageType = constants.STORAGE_LOCAL) {
+  constructor(
+    schema: schemaType,
+    storageType = constants.STORAGE_LOCAL,
+    collectionName = ""
+  ) {
     this.schema = schema;
     this.storageType = storageType;
     this.lastId = 0;
     this.db = getFirestore(appConfig);
-    this.collectionName = "todo";
+    this.collectionName = collectionName;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -59,6 +63,7 @@ export default class CRUD {
     });
     switch (this.storageType) {
       case constants.STORAGE_LOCAL:
+        await null;
         localStorage.setItem(`${this.lastId}`, JSON.stringify(newItem));
         this.lastId += 1;
         break;
@@ -82,6 +87,7 @@ export default class CRUD {
         if (!Object.hasOwnProperty.call(localStorage, `${id}`)) {
           throw new Error(`${constants.STATUS_ERROR}: no ${id} in storage`);
         }
+        await null;
         item = { ...JSON.parse(localStorage.getItem(`${id}`) as string) };
         break;
       case constants.STORAGE_DB:
@@ -118,6 +124,7 @@ export default class CRUD {
         if (!Object.hasOwnProperty.call(localStorage, `${id}`)) {
           throw Error(`${constants.STATUS_ERROR}: no ${id} in storage`);
         }
+        await null;
         newItem = { ...JSON.parse(localStorage.getItem(`${id}`) as string) };
         Object.entries(item).forEach(([key, value]) => {
           newItem[key] = value;
@@ -140,6 +147,7 @@ export default class CRUD {
         if (!Object.hasOwnProperty.call(localStorage, `${id}`)) {
           throw new Error(`${constants.STATUS_ERROR}: no ${id} in storage`);
         }
+        await null;
         localStorage.removeItem(`${id}`);
         break;
       case constants.STORAGE_DB:
